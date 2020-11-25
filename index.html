@@ -14,10 +14,19 @@
     <div class="container">
       <h1 class="jumbotron">Movies</h1>
       <div class="row">
-        <button id="apiCall" class="btn btn-primary">Call Api</button>
+        <input
+          class="col-lg-3"
+          id="searchInput"
+          type="text"
+          class="form-control"
+          placeholder="search"
+          aria-label="search"
+          aria-describedby="basic-addon1"
+        />
+        <button id="apiCall" class="btn btn-primary col-lg-2">Call Api</button>
       </div>
       <div id="loader1" style="display: none" class="loader">Loading...</div>
-      <div id="content"></div>
+      <div id="content" class="row mt-5"></div>
       <div class="row p-3">
         <form id="form_inputs"></form>
       </div>
