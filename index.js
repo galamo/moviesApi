@@ -20,6 +20,7 @@ function init() {
 
 function fetchMoviesBySearchValue(value, returnData) {
   if (!value) return;
+  console.log(`${CONFIG.API_URL}&s=${value}`);
   fetch(`${CONFIG.API_URL}&s=${value}`)
     .then((response) => response.json())
     .then((data) => {
