@@ -11,9 +11,11 @@ const CONFIG = {
 
 function init() {
   DOM.apiCall.addEventListener("click", () => {
+    DOM.loader.style.display = "block";
     fetchMoviesBySearchValue(searchInput.value, (data) => {
       const arrayOfMovies = data.Search;
       draw(arrayOfMovies);
+      DOM.loader.style.display = "none";
     });
   });
 }
