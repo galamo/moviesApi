@@ -5,6 +5,13 @@ const DOM = {
   searchInput: document.getElementById("searchInput"),
   content: document.getElementById("content"),
   mainTitle: document.getElementById("mainTitle"),
+  fontSizeInput: document.getElementById("fontSize"),
+};
+
+const fontSize = {
+  huge: "50px",
+  big: "20px",
+  small: "10px",
 };
 
 let watchList = [];
@@ -33,6 +40,17 @@ function getState() {
 function init() {
   watchList = getState();
   setMainTitle(CONFIG.moviesTitle);
+  DOM.fontSizeInput.addEventListener("change", function () {
+    const val = this.value.toLowerCase();
+    if (!val) return;
+    const selectedFont = fontSize[val];
+    if (!selectedFont) return;
+    const elements = document.getElementsByClassName("card-title");
+    for (let index = 0; index < elements.length; index++) {
+      const cardTitle = elements[index];
+      cardTitle.style.fontSize = selectedFont;
+    }
+  });
   DOM.watchList.addEventListener("click", () => {
     setMainTitle(CONFIG.watchList);
     draw(watchList);
@@ -50,17 +68,28 @@ function init() {
 
 function fetchMoviesBySearchValue(value, returnData) {
   if (!value) return;
-  console.log(`${CONFIG.API_URL}&s=${value}`);
-  fetch(`${CONFIG.API_URL}&s=${value}`)
-    .then((response) => response.json())
-    .then((data) => {
-      returnData(data);
-    })
-    .catch((error) => {
-      console.log(error);
-      alert("We Are sorry something went wrong");
-    });
-  console.log("end function getMoviesFromServer");
+  // console.log(`${CONFIG.API_URL}&s=${value}`);
+  // fetch(`${CONFIG.API_URL}&s=${value}`)
+  //   .then((response) => response.json())
+  //   .then((data) => {
+  //     returnData(data);
+  //   })
+  //   .catch((error) => {
+  //     console.log(error);
+  //     alert("We Are sorry something went wrong");
+  //   });
+  // console.log("end function getMoviesFromServer");
+  callApi(`${CONFIG.API_URL}&s=${value}`, returnData);
+}
+
+async function callApi(url, returnData) {
+  try {
+    const initResult = await fetch(url);
+    const movies = await initResult.json();
+    returnData(movies);
+  } catch (ex) {
+    alert("Failed to fetch data from API");
+  }
 }
 
 init();
