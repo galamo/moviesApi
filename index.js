@@ -20,16 +20,21 @@ function setMainTitle(title) {
   DOM.mainTitle.innerText = title;
 }
 
+function getState() {
+  try {
+    const result = JSON.parse(localStorage.getItem("watchList")) || [];
+    return result;
+  } catch (ex) {
+    console.error("Local Storage is currupted ");
+    return [];
+  }
+}
+
 function init() {
+  watchList = getState();
   setMainTitle(CONFIG.moviesTitle);
   DOM.watchList.addEventListener("click", () => {
     setMainTitle(CONFIG.watchList);
-
-    try {
-      watchList = JSON.parse(localStorage.getItem("watchList"));
-    } catch (ex) {
-      console.error("Local Storage is currupted ");
-    }
     draw(watchList);
   });
   DOM.apiCall.addEventListener("click", () => {
