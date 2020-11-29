@@ -2,8 +2,8 @@
 
 - search your movie
 - print the cards result
-- add more info button
-- clicking on the more info button will return additional info according the API
+- add 'more info' button
+- clicking on the 'more info' button will return additional info according the API
   using IMDBid
   http://www.omdbapi.com/?plot=full&apikey=ce8afb69&i=tt0499549
 
@@ -16,8 +16,8 @@ exmple of result
 
 ```
 
-- present the Actors
-- run another query to Countries API vased on the following query:
+- present the 'Actors' data
+- run another query to Countries API based on the following query:
   https://restcountries.eu/rest/v2/name/usa
   use the country given from IMDB api:
 
