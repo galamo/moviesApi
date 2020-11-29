@@ -1,16 +1,41 @@
 const DOM = {
   loader: document.getElementById("loader1"),
   apiCall: document.getElementById("apiCall"),
+  watchList: document.getElementById("watchList"),
   searchInput: document.getElementById("searchInput"),
   content: document.getElementById("content"),
+  mainTitle: document.getElementById("mainTitle"),
 };
+
+const watchList = [];
 
 const CONFIG = {
   API_URL: `http://www.omdbapi.com/?apikey=ce8afb69`,
+  moviesTitle: "Movies",
+  watchList: "Watch List",
 };
 
+function setMainTitle(title) {
+  if (typeof title !== "string") return;
+  DOM.mainTitle.innerText = title;
+}
+
 function init() {
+  setMainTitle(CONFIG.moviesTitle);
+  DOM.watchList.addEventListener("click", () => {
+    setMainTitle(CONFIG.watchList);
+
+    let watchListFromLocalStorage = [];
+    try {
+      watchListFromLocalStorage = JSON.parse(localStorage.getItem("watchList"));
+    } catch (ex) {
+      console.error("Local Storage is currupted ");
+    }
+
+    draw(watchListFromLocalStorage);
+  });
   DOM.apiCall.addEventListener("click", () => {
+    setMainTitle(CONFIG.moviesTitle);
     DOM.loader.style.display = "block";
     fetchMoviesBySearchValue(searchInput.value, (data) => {
       const arrayOfMovies = data.Search;
@@ -66,7 +91,48 @@ function getMovieCard(data) {
   p.className = "card-text";
   p.innerText = `Year: ${data.Year}, Type: ${data.Type}`;
 
+  const buttonAddToWatchList = _getActionButton("success", "Add", () => {
+    addToWatchList(data);
+  });
+
+  const ButtonRemoveFromWatchList = _getActionButton("danger", "Remove", () => {
+    removeFromWatchList(data);
+  });
+
+  function _getActionButton(className, title, action) {
+    const button = document.createElement("button");
+    button.className = `btn btn-${className}`;
+    button.innerText = title;
+    button.addEventListener("click", action);
+    return button;
+  }
+
+  const isWatchList = DOM.mainTitle.innerText === CONFIG.watchList;
+  const actionButton = isWatchList
+    ? ButtonRemoveFromWatchList
+    : buttonAddToWatchList;
+
   divCardBody.append(h5, p);
-  divCard.append(img, divCardBody);
+  divCard.append(img, divCardBody, actionButton);
+
   return divCard;
+}
+
+function addToWatchList(movie) {
+  if (typeof movie !== "object") return;
+  const isAlreadyExist = watchList.some((m) => m.imdbID === movie.imdbID);
+  if (isAlreadyExist) {
+    alert("The movie is already exist");
+    return;
+  }
+  watchList.push(movie);
+  
+}
+
+function removeFromWatchList(movie) {
+  const deletedIndex = watchList.findIndex((m) => m.imdbID === movie.imdbID);
+  if (deletedIndex === -1) return;
+  watchList.splice(deletedIndex, 1);
+  localStorage.setItem("watchList", JSON.stringify(watchList));
+  draw(watchList);
 }
