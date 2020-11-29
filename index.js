@@ -7,7 +7,7 @@ const DOM = {
   mainTitle: document.getElementById("mainTitle"),
 };
 
-const watchList = [];
+let watchList = [];
 
 const CONFIG = {
   API_URL: `http://www.omdbapi.com/?apikey=ce8afb69`,
@@ -25,14 +25,12 @@ function init() {
   DOM.watchList.addEventListener("click", () => {
     setMainTitle(CONFIG.watchList);
 
-    let watchListFromLocalStorage = [];
     try {
-      watchListFromLocalStorage = JSON.parse(localStorage.getItem("watchList"));
+      watchList = JSON.parse(localStorage.getItem("watchList"));
     } catch (ex) {
       console.error("Local Storage is currupted ");
     }
-
-    draw(watchListFromLocalStorage);
+    draw(watchList);
   });
   DOM.apiCall.addEventListener("click", () => {
     setMainTitle(CONFIG.moviesTitle);
@@ -126,7 +124,7 @@ function addToWatchList(movie) {
     return;
   }
   watchList.push(movie);
-  
+  localStorage.setItem("watchList", JSON.stringify(watchList));
 }
 
 function removeFromWatchList(movie) {
