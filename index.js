@@ -17,7 +17,8 @@ const fontSize = {
 let watchList = [];
 
 const CONFIG = {
-  API_URL: `http://www.omdbapi.com/?apikey=ce8afb69`,
+  MOVIES_API_URL: `http://www.omdbapi.com/?apikey=ce8afb69`,
+  COUNTRIES_API_URL: `  https://restcountries.eu/rest/v2/name`,
   moviesTitle: "Movies",
   watchList: "Watch List",
 };
@@ -68,18 +69,7 @@ function init() {
 
 function fetchMoviesBySearchValue(value, returnData) {
   if (!value) return;
-  // console.log(`${CONFIG.API_URL}&s=${value}`);
-  // fetch(`${CONFIG.API_URL}&s=${value}`)
-  //   .then((response) => response.json())
-  //   .then((data) => {
-  //     returnData(data);
-  //   })
-  //   .catch((error) => {
-  //     console.log(error);
-  //     alert("We Are sorry something went wrong");
-  //   });
-  // console.log("end function getMoviesFromServer");
-  callApi(`${CONFIG.API_URL}&s=${value}`, returnData);
+  callApi(`${CONFIG.MOVIES_API_URL}&s=${value}`, returnData);
 }
 
 async function callApi(url, returnData) {
@@ -123,12 +113,20 @@ function getMovieCard(data) {
   p.className = "card-text";
   p.innerText = `Year: ${data.Year}, Type: ${data.Type}`;
 
+  const divMoreInfo = document.createElement("div");
+  divMoreInfo.id = `more_info_${data.imdbID}`;
+  // divMoreInfo.innerText = "Dumy text";
+
   const buttonAddToWatchList = _getActionButton("success", "Add", () => {
     addToWatchList(data);
   });
 
   const ButtonRemoveFromWatchList = _getActionButton("danger", "Remove", () => {
     removeFromWatchList(data);
+  });
+
+  const moreInfoButton = _getActionButton("primary", "More Info", () => {
+    getMoreInfo(data);
   });
 
   function _getActionButton(className, title, action) {
@@ -145,9 +143,50 @@ function getMovieCard(data) {
     : buttonAddToWatchList;
 
   divCardBody.append(h5, p);
-  divCard.append(img, divCardBody, actionButton);
+  divCard.append(img, divCardBody, actionButton, moreInfoButton, divMoreInfo);
 
   return divCard;
+}
+
+async function getMoreInfo(data) {
+  const countryCode = await getExtendedMovieApi(data.imdbID);
+  const countryObj = await getCountryApi(countryCode);
+
+  _drawFlag(countryObj[0].flag, data.imdbID);
+  function _drawFlag(flag, imdbID) {
+    const moreInfoDiv = document.getElementById(`more_info_${imdbID}`);
+    const img = document.createElement("img");
+    img.src = flag;
+    img.height = 150;
+    img.width = 150;
+    moreInfoDiv.append(img);
+  }
+}
+
+async function getExtendedMovieApi(imdbID) {
+  const result = await fetch(`${CONFIG.MOVIES_API_URL}&plot=full&i=${imdbID}`);
+  const extendedMovie = await result.json();
+  const { Actors, Country, Language, Type } = extendedMovie;
+
+  _drawActors();
+
+  return _getFirstCountryCode(Country);
+  function _getFirstCountryCode(Country) {
+    const countriesArr = Country.split(",");
+    const [firstCountry] = countriesArr;
+    return firstCountry;
+  }
+
+  function _drawActors() {
+    const moreInfoDiv = document.getElementById(`more_info_${imdbID}`);
+    moreInfoDiv.innerText = Actors;
+  }
+}
+
+async function getCountryApi(countryCode) {
+  const result = await fetch(`${CONFIG.COUNTRIES_API_URL}/${countryCode}`);
+  const country = await result.json();
+  return country;
 }
 
 function addToWatchList(movie) {
