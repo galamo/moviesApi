@@ -113,9 +113,13 @@ function getMovieCard(data) {
   p.className = "card-text";
   p.innerText = `Year: ${data.Year}, Type: ${data.Type}`;
 
-  const divMoreInfo = document.createElement("div");
-  divMoreInfo.id = `more_info_${data.imdbID}`;
-  // divMoreInfo.innerText = "Dumy text";
+  const divCollapse = document.createElement("div");
+  const divCollapseBody = document.createElement("div");
+  divCollapse.className = "collapse";
+  divCollapseBody.className = "card card-body";
+  divCollapse.id = `more_info_${data.imdbID}`;
+  divCollapseBody.innerText = `Year: ${data.Year}, Type: ${data.Type}`;
+  divCollapse.append(divCollapseBody);
 
   const buttonAddToWatchList = _getActionButton("success", "Add", () => {
     addToWatchList(data);
@@ -128,6 +132,12 @@ function getMovieCard(data) {
   const moreInfoButton = _getActionButton("primary", "More Info", () => {
     getMoreInfo(data);
   });
+
+  const anchor = document.createElement("a");
+  anchor.innerText = "More info collapse for helal  ";
+  anchor.href = `#more_info_${data.imdbID}`;
+  anchor.className = "btn btn-primary";
+  anchor.setAttribute("data-toggle", "collapse");
 
   function _getActionButton(className, title, action) {
     const button = document.createElement("button");
@@ -143,7 +153,14 @@ function getMovieCard(data) {
     : buttonAddToWatchList;
 
   divCardBody.append(h5, p);
-  divCard.append(img, divCardBody, actionButton, moreInfoButton, divMoreInfo);
+  divCard.append(
+    img,
+    divCardBody,
+    actionButton,
+    moreInfoButton,
+    anchor,
+    divCollapse
+  );
 
   return divCard;
 }
